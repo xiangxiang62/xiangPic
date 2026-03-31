@@ -1,0 +1,13 @@
+package xiangPicBackend;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class XiangPicBackendApplicationTests {
+
+    @Test
+    void contextLoads() {
+    }
+
+}
