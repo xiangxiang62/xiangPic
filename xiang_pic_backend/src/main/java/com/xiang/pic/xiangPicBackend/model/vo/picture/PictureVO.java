@@ -7,6 +7,7 @@ import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -75,7 +76,7 @@ public class PictureVO implements Serializable {
     /**  
      * 创建时间  
      */  
-    private Date createTime;  
+    private Date createTime;
   
     /**  
      * 编辑时间  

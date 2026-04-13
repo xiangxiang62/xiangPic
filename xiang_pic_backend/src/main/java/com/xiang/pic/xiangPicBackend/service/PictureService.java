@@ -6,6 +6,7 @@ import com.xiang.pic.xiangPicBackend.model.domain.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xiang.pic.xiangPicBackend.model.domain.User;
 import com.xiang.pic.xiangPicBackend.model.dto.picture.PictureQueryRequest;
+import com.xiang.pic.xiangPicBackend.model.dto.picture.PictureReviewRequest;
 import com.xiang.pic.xiangPicBackend.model.dto.picture.PictureUploadRequest;
 import com.xiang.pic.xiangPicBackend.model.vo.picture.PictureVO;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 public interface PictureService extends IService<Picture> {
 
     /**
-     * 上传图片
+     * 上传或更新图片
      *
      * @param multipartFile
      * @param pictureUploadRequest
@@ -32,11 +33,63 @@ public interface PictureService extends IService<Picture> {
                             User loginUser);
 
 
+    /**
+     * 构造查询条件
+     *
+     * @param pictureQueryRequest
+     * @return
+     */
     QueryWrapper<Picture> getQueryWrapper(PictureQueryRequest pictureQueryRequest);
 
+    /**
+     * 获取图片分页
+     *
+     * @param picturePage
+     * @param pictureQueryRequest
+     * @param request
+     * @return
+     */
+    Page<PictureVO> getPicturePage(Page<Picture> picturePage,
+                                   PictureQueryRequest pictureQueryRequest,
+                                   HttpServletRequest request);
+
+    /**
+     * 获取图片视图（用户使用）
+     *
+     * @param picture
+     * @param request
+     * @return
+     */
     PictureVO getPictureVO(Picture picture, HttpServletRequest request);
 
+    /**
+     * 获取图片视图分页（用户使用）
+     *
+     * @param picturePage
+     * @param request
+     * @return
+     */
     Page<PictureVO> getPictureVOPage(Page<Picture> picturePage, HttpServletRequest request);
 
+    /**
+     * 参数校验
+     * @param picture
+     */
     void validPicture(Picture picture);
+
+    /**
+     * 图片审核
+     *
+     * @param pictureReviewRequest
+     * @param loginUser
+     */
+    void doPictureReview(PictureReviewRequest pictureReviewRequest, User loginUser);
+
+    /**
+     * 填充图片审核参数
+     *
+     * @param picture
+     * @param loginUser
+     */
+    void fillReviewParams(Picture picture, User loginUser);
 }

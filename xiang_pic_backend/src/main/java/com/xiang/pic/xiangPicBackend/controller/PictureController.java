@@ -16,10 +16,8 @@ import com.xiang.pic.xiangPicBackend.exception.ThrowUtils;
 import com.xiang.pic.xiangPicBackend.manager.CosManager;
 import com.xiang.pic.xiangPicBackend.model.domain.Picture;
 import com.xiang.pic.xiangPicBackend.model.domain.User;
-import com.xiang.pic.xiangPicBackend.model.dto.picture.PictureEditRequest;
-import com.xiang.pic.xiangPicBackend.model.dto.picture.PictureQueryRequest;
-import com.xiang.pic.xiangPicBackend.model.dto.picture.PictureUpdateRequest;
-import com.xiang.pic.xiangPicBackend.model.dto.picture.PictureUploadRequest;
+import com.xiang.pic.xiangPicBackend.model.dto.picture.*;
+import com.xiang.pic.xiangPicBackend.model.enums.PictureReviewStatusEnum;
 import com.xiang.pic.xiangPicBackend.model.vo.picture.PictureTagCategory;
 import com.xiang.pic.xiangPicBackend.model.vo.picture.PictureVO;
 import com.xiang.pic.xiangPicBackend.service.PictureService;
@@ -162,6 +160,8 @@ public class PictureController {
         long size = pictureQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        // 普通用户默认只能查看已过审的数据
+        pictureQueryRequest.setReviewStatus(PictureReviewStatusEnum.PASS.getValue());
         // 查询数据库
         Page<Picture> picturePage = pictureService.page(new Page<>(current, size),
                 pictureService.getQueryWrapper(pictureQueryRequest));
@@ -195,11 +195,14 @@ public class PictureController {
         if (!oldPicture.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
+        // 补充审核参数
+        pictureService.fillReviewParams(picture, loginUser);
         // 操作数据库
         boolean result = pictureService.updateById(picture);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
     }
+
 
     /**
      * 获取默认内置标签
@@ -213,6 +216,23 @@ public class PictureController {
         pictureTagCategory.setTagList(tagList);
         pictureTagCategory.setCategoryList(categoryList);
         return ResultUtils.success(pictureTagCategory);
+    }
+
+    /**
+     * 图片审核接口
+     *
+     * @param pictureReviewRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/review")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> doPictureReview(@RequestBody PictureReviewRequest pictureReviewRequest,
+                                                 HttpServletRequest request) {
+        ThrowUtils.throwIf(pictureReviewRequest == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        pictureService.doPictureReview(pictureReviewRequest, loginUser);
+        return ResultUtils.success(true);
     }
 
 
