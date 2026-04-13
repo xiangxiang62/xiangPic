@@ -35,7 +35,6 @@
               </template>
             </a-dropdown>
           </div>
-
           <div v-else>
             <a-button type="primary" href="/user/login">登录</a-button>
           </div>
@@ -83,9 +82,9 @@ const items = ref<MenuProps["items"]>([
     title: "关于",
   },
   {
-    key: "others",
-    label: h("a", { href: "https://www.codefather.cn", target: "_blank" }, "编程导航"),
-    title: "编程导航",
+    key: '/admin/userManage',
+    label: '用户管理',
+    title: '用户管理',
   },
 ]);
 
