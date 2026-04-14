@@ -1,4 +1,4 @@
-
+// @ts-ignore
 /* eslint-disable */
 import request from "@/request";
 
@@ -83,6 +83,21 @@ export async function listPictureVoByPageUsingPost(
   options?: { [key: string]: any }
 ) {
   return request<API.BaseResponsePagePictureVO_>("/api/file/list/page/vo", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** doPictureReview POST /api/file/review */
+export async function doPictureReviewUsingPost(
+  body: API.PictureReviewRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseBoolean_>("/api/file/review", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
