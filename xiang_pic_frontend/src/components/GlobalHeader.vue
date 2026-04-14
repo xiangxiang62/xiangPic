@@ -4,7 +4,7 @@
       <a-col flex="200px">
         <RouterLink to="/">
           <div class="title-bar">
-            <img class="logo" src="../assets/logo.png" alt="logo" />
+            <img class="logo" src="../assets/logo.png" alt="logo"/>
             <div class="title">享·云图库</div>
           </div>
         </RouterLink>
@@ -22,13 +22,13 @@
           <div v-if="loginUserStore.loginUser.id">
             <a-dropdown>
               <ASpace>
-                <a-avatar :src="loginUserStore.loginUser.userAvatar" />
+                <a-avatar :src="loginUserStore.loginUser.userAvatar"/>
                 {{ loginUserStore.loginUser.userName ?? "无名" }}
               </ASpace>
               <template #overlay>
                 <a-menu>
                   <a-menu-item @click="doLogout">
-                    <LogoutOutlined />
+                    <LogoutOutlined/>
                     退出登录
                   </a-menu-item>
                 </a-menu>
@@ -44,19 +44,19 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { h, ref } from "vue";
-import { HomeOutlined } from "@ant-design/icons-vue";
-import { MenuProps } from "ant-design-vue";
-import { useLoginUserStore } from "@/stores/useLoginUserStore.ts";
-import { userLogoutUsingPost } from "@/api/userController";
-import { message } from "ant-design-vue";
-const loginUserStore = useLoginUserStore();
+import {h, ref} from "vue";
+import {HomeOutlined} from "@ant-design/icons-vue";
+import type {MenuProps} from "ant-design-vue";
+import {useLoginUserStore} from "@/stores/useLoginUserStore.ts";
+import {userLogoutUsingPost} from "@/api/userController";
+import {message} from "ant-design-vue";
+import {useRouter} from "vue-router";
 
-import { useRouter } from "vue-router";
+const loginUserStore = useLoginUserStore();
 const router = useRouter();
 
 // 路由跳转事件
-const doMenuClick = ({ key }: { key: string }) => {
+const doMenuClick = ({key}: { key: string }) => {
   router.push({
     path: key,
   });
@@ -77,6 +77,11 @@ const items = ref<MenuProps["items"]>([
     title: "主页",
   },
   {
+    key: '/add_picture',
+    label: '创建图片',
+    title: '创建图片',
+  },
+  {
     key: "/about",
     label: "关于",
     title: "关于",
@@ -86,6 +91,11 @@ const items = ref<MenuProps["items"]>([
     label: '用户管理',
     title: '用户管理',
   },
+  {
+    key: '/admin/pictureManage',
+    label: '图片管理',
+    title: '图片管理',
+  }
 ]);
 
 // 用户注销
