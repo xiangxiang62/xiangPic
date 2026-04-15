@@ -178,3 +178,18 @@ export async function uploadPictureUsingPost(
     ...(options || {}),
   });
 }
+
+/** uploadPictureByUrl POST /api/file/upload/url */
+export async function uploadPictureByUrlUsingPost(
+  body: API.PictureUploadRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponsePictureVO_>("/api/file/upload/url", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
