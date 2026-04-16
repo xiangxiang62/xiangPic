@@ -17,16 +17,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
-* @author 19643
-* @description 针对表【space(空间)】的数据库操作Service实现
-* @createDate 2026-04-16 14:13:00
-*/
+ * @author 19643
+ * @description 针对表【space(空间)】的数据库操作Service实现
+ * @createDate 2026-04-16 14:13:00
+ */
 @Service
 public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
-    implements SpaceService{
+        implements SpaceService {
 
     @Resource
     private UserService userService;
@@ -34,6 +36,7 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
     @Resource
     private TransactionTemplate transactionTemplate;
 
+    Map<Long, Object> lockMap = new ConcurrentHashMap<>();
 
     /**
      * 添加个人空间
@@ -65,23 +68,26 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权限创建指定级别的空间");
         }
         // 针对用户进行加锁
-        String lock = String.valueOf(userId).intern();
+        Object lock = lockMap.computeIfAbsent(userId, key -> new Object());
         synchronized (lock) {
-            Long newSpaceId = transactionTemplate.execute(status -> {
-                boolean exists = this.lambdaQuery().eq(Space::getUserId, userId).exists();
-                ThrowUtils.throwIf(exists, ErrorCode.OPERATION_ERROR, "每个用户仅能有一个私有空间");
-                // 写入数据库
-                boolean result = this.save(space);
-                ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
-                // 返回新写入的数据 id
-                return space.getId();
-            });
-            // 返回结果是包装类，可以做一些处理
-            return Optional.ofNullable(newSpaceId).orElse(-1L);
+            try {
+                Long newSpaceId = transactionTemplate.execute(status -> {
+                    boolean exists = this.lambdaQuery().eq(Space::getUserId, userId).exists();
+                    ThrowUtils.throwIf(exists, ErrorCode.OPERATION_ERROR, "每个用户仅能有一个私有空间");
+                    // 写入数据库
+                    boolean result = this.save(space);
+                    ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+                    // 返回新写入的数据 id
+                    return space.getId();
+                });
+                // 返回结果是包装类，可以做一些处理
+                return Optional.ofNullable(newSpaceId).orElse(-1L);
+            } finally {
+                // 防止内存泄漏
+                lockMap.remove(userId);
+            }
         }
     }
-
-
 
     /**
      * 根据空间级别，自动填充限额
@@ -105,12 +111,11 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
     }
 
 
-
     /**
      * 校验空间
      *
      * @param space 空间
-     * @param add 创建时校验 or 编辑时校验
+     * @param add   创建时校验 or 编辑时校验
      */
     @Override
     public void validSpace(Space space, boolean add) {
