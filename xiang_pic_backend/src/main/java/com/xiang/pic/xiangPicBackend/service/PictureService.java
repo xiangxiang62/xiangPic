@@ -10,6 +10,7 @@ import com.xiang.pic.xiangPicBackend.model.dto.picture.PictureReviewRequest;
 import com.xiang.pic.xiangPicBackend.model.dto.picture.PictureUploadByBatchRequest;
 import com.xiang.pic.xiangPicBackend.model.dto.picture.PictureUploadRequest;
 import com.xiang.pic.xiangPicBackend.model.vo.picture.PictureVO;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -106,4 +107,11 @@ public interface PictureService extends IService<Picture> {
             User loginUser
     );
 
+
+    /**
+     * 清理图片文件（COS）
+     * @param oldPicture
+     */
+    @Async
+    void clearPictureFile(Picture oldPicture);
 }
