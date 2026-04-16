@@ -18,12 +18,14 @@ import com.xiang.pic.xiangPicBackend.exception.ErrorCode;
 import com.xiang.pic.xiangPicBackend.exception.ThrowUtils;
 import com.xiang.pic.xiangPicBackend.manager.CosManager;
 import com.xiang.pic.xiangPicBackend.model.domain.Picture;
+import com.xiang.pic.xiangPicBackend.model.domain.Space;
 import com.xiang.pic.xiangPicBackend.model.domain.User;
 import com.xiang.pic.xiangPicBackend.model.dto.picture.*;
 import com.xiang.pic.xiangPicBackend.model.enums.PictureReviewStatusEnum;
 import com.xiang.pic.xiangPicBackend.model.vo.picture.PictureTagCategory;
 import com.xiang.pic.xiangPicBackend.model.vo.picture.PictureVO;
 import com.xiang.pic.xiangPicBackend.service.PictureService;
+import com.xiang.pic.xiangPicBackend.service.SpaceService;
 import com.xiang.pic.xiangPicBackend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -54,6 +56,9 @@ public class PictureController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private SpaceService spaceService;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -143,6 +148,12 @@ public class PictureController {
         // 查询数据库
         Picture picture = pictureService.getById(id);
         ThrowUtils.throwIf(picture == null, ErrorCode.NOT_FOUND_ERROR);
+        // 空间权限校验
+        Long spaceId = picture.getSpaceId();
+        if (spaceId != null) {
+            User loginUser = userService.getLoginUser(request);
+            pictureService.checkPictureAuth(loginUser, picture);
+        }
         // 获取封装类
         return ResultUtils.success(pictureService.getPictureVO(picture, request));
     }
@@ -173,6 +184,22 @@ public class PictureController {
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         // 普通用户默认只能查看已过审的数据
         pictureQueryRequest.setReviewStatus(PictureReviewStatusEnum.PASS.getValue());
+        // 空间权限校验
+        Long spaceId = pictureQueryRequest.getSpaceId();
+        // 公开图库
+        if (spaceId == null) {
+            // 普通用户默认只能查看已过审的公开数据
+            pictureQueryRequest.setReviewStatus(PictureReviewStatusEnum.PASS.getValue());
+            pictureQueryRequest.setNullSpaceId(true);
+        } else {
+            // 私有空间
+            User loginUser = userService.getLoginUser(request);
+            Space space = spaceService.getById(spaceId);
+            ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
+            if (!loginUser.getId().equals(space.getUserId())) {
+                throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有空间权限");
+            }
+        }
         // 查询数据库
         Page<Picture> picturePage = pictureService.page(new Page<>(current, size),
                 pictureService.getQueryWrapper(pictureQueryRequest));
@@ -187,6 +214,7 @@ public class PictureController {
      * @param request
      * @return
      */
+    @Deprecated
     @PostMapping("/list/page/vo/cache")
     public BaseResponse<Page<PictureVO>> listPictureVOByPageWithCache(@RequestBody PictureQueryRequest pictureQueryRequest,
                                                                       HttpServletRequest request) {
