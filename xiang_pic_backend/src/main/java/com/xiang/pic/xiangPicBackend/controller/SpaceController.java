@@ -18,8 +18,10 @@ import com.xiang.pic.xiangPicBackend.model.domain.User;
 import com.xiang.pic.xiangPicBackend.model.dto.picture.*;
 import com.xiang.pic.xiangPicBackend.model.dto.space.SpaceUpdateRequest;
 import com.xiang.pic.xiangPicBackend.model.enums.PictureReviewStatusEnum;
+import com.xiang.pic.xiangPicBackend.model.enums.SpaceLevelEnum;
 import com.xiang.pic.xiangPicBackend.model.vo.picture.PictureTagCategory;
 import com.xiang.pic.xiangPicBackend.model.vo.picture.PictureVO;
+import com.xiang.pic.xiangPicBackend.model.vo.space.SpaceLevel;
 import com.xiang.pic.xiangPicBackend.service.PictureService;
 import com.xiang.pic.xiangPicBackend.service.SpaceService;
 import com.xiang.pic.xiangPicBackend.service.UserService;
@@ -37,6 +39,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -46,6 +49,23 @@ public class SpaceController {
     @Resource
     private SpaceService spaceService;
 
+
+    /**
+     * 空间等级列表
+     *
+     * @return
+     */
+    @GetMapping("/list/level")
+    public BaseResponse<List<SpaceLevel>> listSpaceLevel() {
+        List<SpaceLevel> spaceLevelList = Arrays.stream(SpaceLevelEnum.values()) // 获取所有枚举
+                .map(spaceLevelEnum -> new SpaceLevel(
+                        spaceLevelEnum.getValue(),
+                        spaceLevelEnum.getText(),
+                        spaceLevelEnum.getMaxCount(),
+                        spaceLevelEnum.getMaxSize()))
+                .collect(Collectors.toList());
+        return ResultUtils.success(spaceLevelList);
+    }
 
     /**
      * 更新空间（仅管理员可用）
