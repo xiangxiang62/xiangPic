@@ -120,6 +120,7 @@ const fetchData = async () => {
       params.tags.push(tagList.value[index])
     }
   })
+
   const res = await listPictureVoByPageUsingPost(params)
   if (res.data.data) {
     dataList.value = res.data.data.records ?? []

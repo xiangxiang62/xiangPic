@@ -4,9 +4,11 @@
 // API 唯一标识：
 import * as pictureController from "./pictureController";
 import * as fileController from "./fileController";
+import * as spaceController from "./spaceController";
 import * as userController from "./userController";
 export default {
   pictureController,
   fileController,
+  spaceController,
   userController,
 };
