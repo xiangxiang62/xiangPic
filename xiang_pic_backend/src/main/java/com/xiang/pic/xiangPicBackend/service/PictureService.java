@@ -108,10 +108,21 @@ public interface PictureService extends IService<Picture> {
     );
 
 
+    void deletePicture(long pictureId, User loginUser);
+
     /**
      * 清理图片文件（COS）
      * @param oldPicture
      */
     @Async
     void clearPictureFile(Picture oldPicture);
+
+
+    /**
+     * 检查图片权限
+     *
+     * @param loginUser
+     * @param picture
+     */
+    void checkPictureAuth(User loginUser, Picture picture);
 }
