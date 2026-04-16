@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
 * @author 19643
@@ -113,6 +114,13 @@ public interface PictureService extends IService<Picture> {
      */
     @Async
     void clearPictureFile(Picture oldPicture);
+
+    /**
+     * 批量清理文件（通过文件 url 列表）
+     * @param urlList
+     */
+    @Async
+    void clearPictureFile(List<String> urlList);
 
     /**
      * 编辑图片

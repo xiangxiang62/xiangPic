@@ -30,5 +30,10 @@ public class SpaceQueryRequest extends PageRequest implements Serializable {
      */
     private Integer spaceLevel;
 
+    /**
+     * 搜索词
+     */
+    private String searchText;
+
     private static final long serialVersionUID = 1L;
 }

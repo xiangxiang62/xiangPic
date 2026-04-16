@@ -32,9 +32,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
@@ -68,6 +68,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
     @Resource
     private CosManager cosManager;
 
+    @Lazy
     @Resource
     private SpaceService spaceService;
 
@@ -538,6 +539,23 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         if (StrUtil.isNotBlank(thumbnailUrl)) {
             cosManager.deleteObject(thumbnailUrl);
         }
+    }
+
+
+    /**
+     *
+     * @param urlList
+     */
+    @Async
+    @Override
+    public void clearPictureFile(List<String> urlList) {
+        // 如果列表为空，则直接返回
+        if (CollUtil.isEmpty(urlList)) {
+            return;
+        }
+        // 这里的 url 包含了域名，实际上只要传 key 值（存储路径）就够了
+        cosManager.deleteBatchObjects(urlList);
+        // todo 清理缩略图
     }
 
     /**

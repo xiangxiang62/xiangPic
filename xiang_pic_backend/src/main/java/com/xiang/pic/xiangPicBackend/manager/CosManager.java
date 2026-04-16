@@ -3,26 +3,29 @@ package com.xiang.pic.xiangPicBackend.manager;
 import cn.hutool.core.io.FileUtil;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.exception.CosClientException;
-import com.qcloud.cos.model.COSObject;
-import com.qcloud.cos.model.GetObjectRequest;
-import com.qcloud.cos.model.PutObjectRequest;
-import com.qcloud.cos.model.PutObjectResult;
+import com.qcloud.cos.exception.MultiObjectDeleteException;
+import com.qcloud.cos.model.*;
 import com.qcloud.cos.model.ciModel.persistence.PicOperations;
 import com.xiang.pic.xiangPicBackend.config.CosClientConfig;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Component
-public class CosManager {  
-  
+public class CosManager {
+
     @Resource
     private CosClientConfig cosClientConfig;
-  
-    @Resource  
+
+    @Resource
     private COSClient cosClient;
 
     /**
@@ -95,5 +98,48 @@ public class CosManager {
         cosClient.deleteObject(cosClientConfig.getBucket(), key);
     }
 
+
+    /**
+     * 批量删除对象
+     *
+     * @param keys 要删除的文件key列表
+     */
+    @Async
+    public void deleteBatchObjects(List<String> keys) {
+        // 1. 构建批量删除请求
+        DeleteObjectsRequest deleteRequest = new DeleteObjectsRequest(cosClientConfig.getBucket());
+
+        // 2. 将key列表转换为KeyVersion对象列表
+        List<DeleteObjectsRequest.KeyVersion> keyList = keys.stream()
+                .map(DeleteObjectsRequest.KeyVersion::new)
+                .collect(Collectors.toList());
+        deleteRequest.setKeys(keyList);
+
+        // 可选：设置返回模式，true=只返回失败信息，false=返回全部信息（默认）
+        deleteRequest.setQuiet(false);
+
+        try {
+            // 3. 执行批量删除
+            DeleteObjectsResult result = cosClient.deleteObjects(deleteRequest);
+
+            // 4. 处理成功删除的结果
+            List<DeleteObjectsResult.DeletedObject> deletedObjects = result.getDeletedObjects();
+            for (DeleteObjectsResult.DeletedObject obj : deletedObjects) {
+                log.info("删除成功{},当前时间{}", obj.getKey(), new Date());
+            }
+        } catch (MultiObjectDeleteException mde) {
+            // 5. 部分成功、部分失败时抛出的异常
+            log.info("部分删除失败");
+            List<MultiObjectDeleteException.DeleteError> errors = mde.getErrors();
+            for (MultiObjectDeleteException.DeleteError error : errors) {
+                log.info("key: " + error.getKey() + ", 错误码: " +
+                        error.getCode() + ", 消息: " + error.getMessage());
+            }
+
+        } catch (Exception e) {
+            // 6. 其他异常（如网络错误、权限不足等）
+            e.printStackTrace();
+        }
+    }
 
 }

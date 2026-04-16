@@ -1,9 +1,16 @@
 package com.xiang.pic.xiangPicBackend.service;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xiang.pic.xiangPicBackend.model.domain.Space;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xiang.pic.xiangPicBackend.model.domain.User;
 import com.xiang.pic.xiangPicBackend.model.dto.space.SpaceAddRequest;
+import com.xiang.pic.xiangPicBackend.model.dto.space.SpaceEditRequest;
+import com.xiang.pic.xiangPicBackend.model.dto.space.SpaceQueryRequest;
+import com.xiang.pic.xiangPicBackend.model.vo.space.SpaceVO;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
 * @author 19643
@@ -36,4 +43,45 @@ public interface SpaceService extends IService<Space> {
      * @param add 创建时校验 or 编辑时校验
      */
     void validSpace(Space space, boolean add);
+
+    /**
+     * 获取空间视图
+     *
+     * @param space
+     * @param request
+     * @return
+     */
+    SpaceVO getSpaceVO(Space space, HttpServletRequest request);
+
+    /**
+     * 获取空间查询条件
+     *
+     * @param spaceQueryRequest
+     * @return
+     */
+    Wrapper<Space> getQueryWrapper(SpaceQueryRequest spaceQueryRequest);
+
+    /**
+     * 获取空间视图分页
+     * @param spacePage
+     * @param request
+     * @return
+     */
+    Page<SpaceVO> getSpaceVOPage(Page<Space> spacePage, HttpServletRequest request);
+
+    /**
+     * 编辑空间信息
+     *
+     * @param spaceEditRequest
+     * @param loginUser
+     */
+    void editSpace(SpaceEditRequest spaceEditRequest, User loginUser);
+
+    /**
+     * 删除空间
+     *
+     * @param id
+     * @param loginUser
+     */
+    void deleteSpace(long id, User loginUser);
 }
