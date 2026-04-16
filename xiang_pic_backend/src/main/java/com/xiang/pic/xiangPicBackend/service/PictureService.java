@@ -5,10 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xiang.pic.xiangPicBackend.model.domain.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xiang.pic.xiangPicBackend.model.domain.User;
-import com.xiang.pic.xiangPicBackend.model.dto.picture.PictureQueryRequest;
-import com.xiang.pic.xiangPicBackend.model.dto.picture.PictureReviewRequest;
-import com.xiang.pic.xiangPicBackend.model.dto.picture.PictureUploadByBatchRequest;
-import com.xiang.pic.xiangPicBackend.model.dto.picture.PictureUploadRequest;
+import com.xiang.pic.xiangPicBackend.model.dto.picture.*;
 import com.xiang.pic.xiangPicBackend.model.vo.picture.PictureVO;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.multipart.MultipartFile;
@@ -117,6 +114,13 @@ public interface PictureService extends IService<Picture> {
     @Async
     void clearPictureFile(Picture oldPicture);
 
+    /**
+     * 编辑图片
+     *
+     * @param pictureEditRequest
+     * @param loginUser
+     */
+    void editPicture(PictureEditRequest pictureEditRequest, User loginUser);
 
     /**
      * 检查图片权限
