@@ -46,7 +46,7 @@ public class SpaceController {
 
 
     /**
-     * 根据 id 获取图片（仅管理员可用）
+     * 根据 id 获取空间（仅管理员可用）
      */
     @GetMapping("/get")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -60,18 +60,15 @@ public class SpaceController {
     }
 
     /**
-     * 创建用户
+     * 创建空间
      */
     @PostMapping("/add")
     public BaseResponse<Long> addSpace(@RequestBody SpaceAddRequest spaceAddRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(spaceAddRequest == null, ErrorCode.PARAMS_ERROR);
         User loginUser = userService.getLoginUser(request);
-        Space space = new Space();
-        BeanUtils.copyProperties(spaceAddRequest, space);
-        space.setUserId(loginUser.getId());
-        boolean result = spaceService.save(space);
-        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
-        return ResultUtils.success(space.getId());
+        long result = spaceService.addSpace(spaceAddRequest,loginUser);
+        return ResultUtils.success(result);
+
     }
 
     /**
