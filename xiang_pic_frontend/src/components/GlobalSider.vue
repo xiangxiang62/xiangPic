@@ -58,18 +58,7 @@ router.afterEach((to, from, failure) => {
 </script>
 
 <style scoped>
-.title-bar {
-  display: flex;
-  align-items: center;
-}
-
-.title {
-  color: black;
-  font-size: 18px;
-  margin-left: 16px;
-}
-
-.logo {
-  height: 48px;
+.globalSider .ant-layout-sider {
+  background-color: white;
 }
 </style>
