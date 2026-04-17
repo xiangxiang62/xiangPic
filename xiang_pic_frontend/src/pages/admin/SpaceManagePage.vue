@@ -7,7 +7,7 @@
       </a-space>
     </a-flex>
     <!-- 搜索表单 -->
-    <a-form layout="inline" :model="formData" @finish="handleSubmit">
+    <a-form layout="inline" :model="formData" @finish="doSearch">
       <a-form-item label="空间名称" name="spaceName">
         <a-input v-model:value="formData.spaceName" placeholder="请输入空间名称" allow-clear />
       </a-form-item>
@@ -67,11 +67,14 @@
 import {computed, onMounted, reactive, ref} from 'vue'
 import {formatSize} from "@/utils";
 import router from "@/router";
-import {deletePictureUsingPost} from '@/api/pictureController.ts'
 import {message} from 'ant-design-vue'
 import dayjs from 'dayjs'
 
-import {addSpaceUsingPost, listSpaceByPageUsingPost} from "@/api/spaceController";
+import {
+  addSpaceUsingPost,
+  deleteSpaceUsingPost,
+  listSpaceByPageUsingPost
+} from "@/api/spaceController";
 import {SPACE_LEVEL_ENUM, SPACE_LEVEL_MAP, SPACE_LEVEL_OPTIONS} from "@/constants/space";
 
 const columns = [
@@ -177,7 +180,7 @@ const doDelete = async (id: string) => {
   if (!id) {
     return
   }
-  const res = await deletePictureUsingPost({id: +id})
+  const res = await deleteSpaceUsingPost({id})
   if (res.data.code === 0) {
     message.success('删除成功')
     // 刷新数据
