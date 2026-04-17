@@ -125,6 +125,21 @@ export async function doPictureReviewUsingPost(
   });
 }
 
+/** searchPictureByColor POST /api/file/search/color */
+export async function searchPictureByColorUsingPost(
+  body: API.SearchPictureByColorRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseListPictureVO_>("/api/file/search/color", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** searchPictureByPicture POST /api/file/search/picture */
 export async function searchPictureByPictureUsingPost(
   body: API.SearchPictureByPictureRequest,

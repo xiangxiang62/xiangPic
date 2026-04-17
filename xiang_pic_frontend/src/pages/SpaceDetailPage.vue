@@ -21,6 +21,15 @@
     <!-- 搜索表单 -->
     <PictureSearchForm :onSearch="onSearch" />
     <div style="margin-bottom: 16px" ></div>
+    <!-- 按颜色搜索 -->
+    <a-form-item label="按颜色搜索" style="margin-top: 16px">
+      <input
+        type="color"
+        :value="selectedColor"
+        @change="onColorChange"
+        style="width: 32px; height: 32px; cursor: pointer;"
+      />
+    </a-form-item>
     <!-- 图片列表 -->
     <PictureList :dataList="dataList"
                  :loading="loading"
@@ -40,7 +49,7 @@
 
 <script setup lang="ts">
 import {
-  listPictureVoByPageUsingPost
+  listPictureVoByPageUsingPost, searchPictureByColorUsingPost
 } from "@/api/pictureController";
 import {onMounted, ref} from "vue";
 import {message} from "ant-design-vue";
@@ -48,7 +57,7 @@ import {formatSize} from "@/utils";
 import PictureList from "@/components/PictureList.vue";
 import {getSpaceVoByIdUsingGet} from "@/api/spaceController";
 import PictureSearchForm from "@/components/PictureSearchForm.vue";
-
+const selectedColor = ref('#ffffff');
 const props = defineProps<{
   id: string | number
 }>()
@@ -120,6 +129,34 @@ const fetchData = async () => {
     message.error('获取数据失败，' + res.data.message)
   }
   loading.value = false
+}
+
+/**
+ * 按照颜色搜索图片
+ *
+ * @param color
+ */
+const onColorChange = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const colorValue = target.value;
+  console.log('选择的颜色：', colorValue);
+
+  try {
+    const res = await searchPictureByColorUsingPost({
+      picColor: colorValue,
+      spaceId: props.id,
+    });
+
+    if (res.data.code === 0 && res.data.data) {
+      const data = res.data.data ?? [];
+      dataList.value = data;
+      total.value = data.length;
+    } else {
+      message.error('获取数据失败，' + res.data.message);
+    }
+  } catch (error: any) {
+    message.error('获取数据失败：' + error.message);
+  }
 }
 
 

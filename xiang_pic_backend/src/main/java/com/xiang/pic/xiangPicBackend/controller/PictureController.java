@@ -10,6 +10,7 @@ import com.qcloud.cos.model.COSObjectInputStream;
 import com.qcloud.cos.utils.IOUtils;
 import com.xiang.pic.xiangPicBackend.annotation.AuthCheck;
 import com.xiang.pic.xiangPicBackend.api.imagesearch.ImageSearchApiFacade;
+import com.xiang.pic.xiangPicBackend.api.imagesearch.dto.SearchPictureByColorRequest;
 import com.xiang.pic.xiangPicBackend.api.imagesearch.dto.SearchPictureByPictureRequest;
 import com.xiang.pic.xiangPicBackend.api.imagesearch.model.ImageSearchResult;
 import com.xiang.pic.xiangPicBackend.common.BaseResponse;
@@ -357,6 +358,24 @@ public class PictureController {
         List<ImageSearchResult> resultList = ImageSearchApiFacade.searchImage(oldPicture.getUrl());
         return ResultUtils.success(resultList);
     }
+
+    /**
+     * 根据颜色搜索图片
+     *
+     * @param searchPictureByColorRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/search/color")
+    public BaseResponse<List<PictureVO>> searchPictureByColor(@RequestBody SearchPictureByColorRequest searchPictureByColorRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(searchPictureByColorRequest == null, ErrorCode.PARAMS_ERROR);
+        String picColor = searchPictureByColorRequest.getPicColor();
+        Long spaceId = searchPictureByColorRequest.getSpaceId();
+        User loginUser = userService.getLoginUser(request);
+        List<PictureVO> result = pictureService.searchPictureByColor(spaceId, picColor, loginUser);
+        return ResultUtils.success(result);
+    }
+
 
 
 }
