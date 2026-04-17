@@ -31,11 +31,15 @@
               </template>
             </a-card-meta>
             <template v-if="showOp" #actions>
-              <a-space @click="e => doEdit(picture, e)">
+              <a-space @click="(e) => doSearch(picture, e)">
+                <search-outlined />
+                搜索
+              </a-space>
+              <a-space @click="(e) => doEdit(picture, e)">
                 <edit-outlined />
                 编辑
               </a-space>
-              <a-space @click="e => doDelete(picture, e)">
+              <a-space @click="(e) => doDelete(picture, e)">
                 <delete-outlined />
                 删除
               </a-space>
@@ -49,7 +53,7 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons-vue';
+import { DeleteOutlined, EditOutlined,SearchOutlined  } from '@ant-design/icons-vue';
 import {deletePictureUsingPost} from "@/api/pictureController";
 import {message} from "ant-design-vue";
 interface Props {
@@ -102,6 +106,13 @@ const doDelete = async (picture, e) => {
     message.error('删除失败')
   }
 }
+
+// 搜索
+const doSearch = (picture, e) => {
+  e.stopPropagation()
+  window.open(`/search_picture?pictureId=${picture.id}`)
+}
+
 
 </script>
 
