@@ -10,9 +10,10 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {ref} from 'vue';
+import {computed, ref} from 'vue';
 import {message} from 'ant-design-vue';
 import {uploadPictureByUrlUsingPost} from "@/api/pictureController";
+import {useRoute} from "vue-router";
 
 const props = defineProps<Props>();
 const loading = ref<boolean>(false);
@@ -20,6 +21,7 @@ const fileUrl = ref<string>();
 
 interface Props {
   picture?: API.PictureVO
+  spaceId?: number
   onSuccess?: (newPicture: API.PictureVO) => void
 }
 
@@ -29,7 +31,7 @@ interface Props {
 const handleUpload = async () => {
   loading.value = true
   try {
-    const params: API.PictureUploadRequest = { fileUrl: fileUrl.value }
+    const params: API.PictureUploadRequest = { fileUrl: fileUrl.value, spaceId : props.spaceId }
     if (props.picture) {
       params.id = props.picture.id
     }
