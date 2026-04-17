@@ -728,7 +728,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         long count = 1;
         try {
             for (Picture picture : pictureList) {
-                String pictureName = nameRule.replaceAll("\\{序号}", String.valueOf(count++));
+                String pictureName = (nameRule + "({序号})").replace("{序号}", String.valueOf(count++));
                 picture.setName(pictureName);
             }
         } catch (Exception e) {
