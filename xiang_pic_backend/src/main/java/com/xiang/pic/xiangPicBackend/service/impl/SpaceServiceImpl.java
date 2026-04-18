@@ -3,7 +3,6 @@ package com.xiang.pic.xiangPicBackend.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -11,7 +10,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xiang.pic.xiangPicBackend.exception.BusinessException;
 import com.xiang.pic.xiangPicBackend.exception.ErrorCode;
 import com.xiang.pic.xiangPicBackend.exception.ThrowUtils;
-import com.xiang.pic.xiangPicBackend.manager.CosManager;
 import com.xiang.pic.xiangPicBackend.model.domain.Picture;
 import com.xiang.pic.xiangPicBackend.model.domain.Space;
 import com.xiang.pic.xiangPicBackend.model.domain.User;
@@ -19,7 +17,6 @@ import com.xiang.pic.xiangPicBackend.model.dto.space.SpaceAddRequest;
 import com.xiang.pic.xiangPicBackend.model.dto.space.SpaceEditRequest;
 import com.xiang.pic.xiangPicBackend.model.dto.space.SpaceQueryRequest;
 import com.xiang.pic.xiangPicBackend.model.enums.SpaceLevelEnum;
-import com.xiang.pic.xiangPicBackend.model.vo.picture.PictureVO;
 import com.xiang.pic.xiangPicBackend.model.vo.space.SpaceVO;
 import com.xiang.pic.xiangPicBackend.model.vo.user.UserVO;
 import com.xiang.pic.xiangPicBackend.service.PictureService;
@@ -27,8 +24,6 @@ import com.xiang.pic.xiangPicBackend.service.SpaceService;
 import com.xiang.pic.xiangPicBackend.mapper.SpaceMapper;
 import com.xiang.pic.xiangPicBackend.service.UserService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -85,9 +80,7 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
         Long userId = loginUser.getId();
         space.setUserId(userId);
         // 权限校验
-        if (SpaceLevelEnum.COMMON.getValue() != spaceAddRequest.getSpaceLevel() && !userService.isAdmin(loginUser)) {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权限创建指定级别的空间");
-        }
+        checkSpaceAuth(loginUser, space);
         // 针对用户进行加锁
         Object lock = lockMap.computeIfAbsent(userId, key -> new Object());
         synchronized (lock) {
@@ -107,6 +100,20 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
                 // 防止内存泄漏
                 lockMap.remove(userId);
             }
+        }
+    }
+
+    /**
+     * 验证访问空间权限
+     *
+     * @param loginUser
+     * @param space
+     */
+    @Override
+    public void checkSpaceAuth(User loginUser, Space space) {
+        // 权限校验
+        if (SpaceLevelEnum.COMMON.getValue() != space.getSpaceLevel() && !userService.isAdmin(loginUser)) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权限创建指定级别的空间");
         }
     }
 

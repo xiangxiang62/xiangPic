@@ -30,6 +30,14 @@ public interface SpaceService extends IService<Space> {
     long addSpace(SpaceAddRequest spaceAddRequest, User loginUser);
 
     /**
+     * 验证访问空间权限
+     *
+     * @param loginUser
+     * @param space
+     */
+    void checkSpaceAuth(User loginUser, Space space);
+
+    /**
      * 根据空间级别，自动填充限额
      *
      * @param space 空间
