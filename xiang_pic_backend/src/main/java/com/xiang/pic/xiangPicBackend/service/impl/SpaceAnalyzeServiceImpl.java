@@ -16,6 +16,7 @@ import com.xiang.pic.xiangPicBackend.service.PictureService;
 import com.xiang.pic.xiangPicBackend.service.SpaceAnalyzeService;
 import com.xiang.pic.xiangPicBackend.service.SpaceService;
 import com.xiang.pic.xiangPicBackend.service.UserService;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.LinkedHashMap;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Service
 public class SpaceAnalyzeServiceImpl implements SpaceAnalyzeService {
 
     @Resource
