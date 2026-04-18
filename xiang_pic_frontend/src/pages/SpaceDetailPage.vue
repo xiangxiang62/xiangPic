@@ -7,6 +7,16 @@
         <a-button type="primary" :href="`/add_picture?spaceId=${id}`" target="_blank">
           + 创建图片
         </a-button>
+        <a-button
+          type="primary"
+          ghost
+          :icon="h(BarChartOutlined)"
+          :href="`/space_analyze?spaceId=${id}`"
+          target="_blank"
+        >
+          空间分析
+        </a-button>
+
         <a-button @click="doBatchEdit">
           <EditOutlined />
           批量编辑
@@ -61,6 +71,7 @@
 import {
   listPictureVoByPageUsingPost, searchPictureByColorUsingPost
 } from "@/api/pictureController";
+import {EditOutlined,BarChartOutlined} from "@ant-design/icons-vue";
 import {onMounted, ref,h} from "vue";
 import {message} from "ant-design-vue";
 import {formatSize} from "@/utils";
