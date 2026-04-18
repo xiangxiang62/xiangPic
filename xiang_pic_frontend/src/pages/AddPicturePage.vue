@@ -6,7 +6,6 @@
     <a-typography-paragraph v-if="spaceId" type="secondary">
       保存至空间：<a :href="`/space/${spaceId}`" target="_blank">{{ spaceId }}</a>
     </a-typography-paragraph>
-
     <!-- 选择上传方式 -->
     <a-tabs v-model:activeKey="uploadType"
     >>
@@ -17,7 +16,16 @@
         <UrlPictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess"/>
       </a-tab-pane>
     </a-tabs>
-
+    <div v-if="picture" class="edit-bar">
+      <a-button :icon="h(EditOutlined)" @click="doEditPicture">编辑图片</a-button>
+      <ImageCropper
+        ref="imageCropperRef"
+        :imageUrl="picture?.url"
+        :picture="picture"
+        :spaceId="spaceId"
+        :onSuccess="onSuccess"
+      />
+    </div>
     <a-form v-if="picture" layout="vertical" :model="pictureForm" @finish="handleSubmit">
       <a-form-item label="名称" name="name">
         <a-input v-model:value="pictureForm.name" placeholder="请输入名称"/>
@@ -59,7 +67,7 @@
 <script setup lang="ts">
 import PictureUpload from "@/components/PictureUpload.vue";
 import UrlPictureUpload from "@/components/UrlPictureUpload.vue";
-import {computed, onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref,h} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {
   editPictureUsingPost,
@@ -67,6 +75,8 @@ import {
   listPictureTagCategoryUsingGet
 } from "@/api/pictureController";
 import {message} from "ant-design-vue";
+import ImageCropper from "@/components/ImageCropper.vue";
+import {EditOutlined} from "@ant-design/icons-vue";
 
 const picture = ref<API.PictureVO>()
 const pictureForm = reactive<API.PictureEditRequest>({})
@@ -161,6 +171,22 @@ const getOldPicture = async () => {
   }
 }
 
+// 图片编辑弹窗引用
+const imageCropperRef = ref()
+
+// 编辑图片
+const doEditPicture = () => {
+  if (imageCropperRef.value) {
+    imageCropperRef.value.openModal()
+  }
+}
+
+// 编辑成功事件
+const onCropSuccess = (newPicture: API.PictureVO) => {
+  picture.value = newPicture
+}
+
+
 onMounted(() => {
   getOldPicture()
 })
@@ -173,5 +199,11 @@ onMounted(() => {
   max-width: 720px;
   margin: 0 auto;
 }
+
+#addPicturePage .edit-bar {
+  text-align: center;
+  margin: 16px 0;
+}
+
 
 </style>
