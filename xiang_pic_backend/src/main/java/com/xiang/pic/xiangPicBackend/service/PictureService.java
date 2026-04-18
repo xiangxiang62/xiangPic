@@ -2,6 +2,7 @@ package com.xiang.pic.xiangPicBackend.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.xiang.pic.xiangPicBackend.api.aliyunai.model.CreateOutPaintingTaskResponse;
 import com.xiang.pic.xiangPicBackend.model.domain.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xiang.pic.xiangPicBackend.model.domain.User;
@@ -157,4 +158,6 @@ public interface PictureService extends IService<Picture> {
      * @param picture
      */
     void checkPictureAuth(User loginUser, Picture picture);
+
+    CreateOutPaintingTaskResponse createPictureOutPaintingTask(CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest, User loginUser);
 }
