@@ -9,6 +9,7 @@ import com.xiang.pic.xiangPicBackend.constant.UserConstant;
 import com.xiang.pic.xiangPicBackend.exception.BusinessException;
 import com.xiang.pic.xiangPicBackend.exception.ErrorCode;
 import com.xiang.pic.xiangPicBackend.exception.ThrowUtils;
+import com.xiang.pic.xiangPicBackend.manager.auth.SpaceUserAuthManager;
 import com.xiang.pic.xiangPicBackend.model.domain.Picture;
 import com.xiang.pic.xiangPicBackend.model.domain.Space;
 import com.xiang.pic.xiangPicBackend.model.domain.User;
@@ -44,6 +45,8 @@ public class SpaceController {
     @Resource
     private UserService userService;
 
+    @Resource
+    private SpaceUserAuthManager spaceUserAuthManager;
 
     /**
      * 根据 id 获取空间（仅管理员可用）
@@ -80,9 +83,14 @@ public class SpaceController {
         // 查询数据库
         Space space = spaceService.getById(id);
         ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR);
+        SpaceVO spaceVO = spaceService.getSpaceVO(space, request);
+        User loginUser = userService.getLoginUser(request);
+        List<String> permissionList = spaceUserAuthManager.getPermissionList(space, loginUser);
+        spaceVO.setPermissionList(permissionList);
         // 获取封装类
-        return ResultUtils.success(spaceService.getSpaceVO(space, request));
+        return ResultUtils.success(spaceVO);
     }
+
 
 
     /**

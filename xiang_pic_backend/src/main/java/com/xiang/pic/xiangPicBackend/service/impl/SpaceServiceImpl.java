@@ -28,6 +28,7 @@ import com.xiang.pic.xiangPicBackend.mapper.SpaceMapper;
 import com.xiang.pic.xiangPicBackend.service.SpaceUserService;
 import com.xiang.pic.xiangPicBackend.service.UserService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -56,6 +57,7 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
     private PictureService pictureService;
 
     @Resource
+    @Lazy
     private SpaceUserService spaceUserService;
 
     Map<Long, Object> lockMap = new ConcurrentHashMap<>();
