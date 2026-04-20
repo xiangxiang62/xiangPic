@@ -21,12 +21,14 @@ const checkUserSpace = async () => {
     await router.replace('/user/login')
     return
   }
-  // 获取用户空间信息
+// 获取用户空间信息（因为用户可能具有多个空间，但目前业务规定我的空间为个人私有空间，则为私有空间的第一个）
   const res = await listSpaceVoByPageUsingPost({
     userId: loginUser.id,
     current: 1,
     pageSize: 1,
+    spaceType: 0,
   })
+
   if (res.data.code === 0) {
     if (res.data.data?.records?.length > 0) {
       const space = res.data.data.records[0]
