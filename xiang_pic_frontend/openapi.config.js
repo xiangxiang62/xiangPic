@@ -1,4 +1,4 @@
-import { generateService } from '@umijs/openapi'
+import {generateService} from '@umijs/openapi'
 
 generateService({
   requestLibPath: "import request from '@/request'",

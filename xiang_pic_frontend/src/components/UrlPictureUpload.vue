@@ -10,10 +10,9 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {computed, ref} from 'vue';
+import {ref} from 'vue';
 import {message} from 'ant-design-vue';
 import {uploadPictureByUrlUsingPost} from "@/api/pictureController";
-import {useRoute} from "vue-router";
 
 const props = defineProps<Props>();
 const loading = ref<boolean>(false);

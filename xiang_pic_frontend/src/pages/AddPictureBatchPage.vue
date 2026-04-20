@@ -30,9 +30,7 @@
 <script setup lang="ts">
 import {reactive, ref} from "vue";
 import {useRouter} from "vue-router";
-import {
-  uploadPictureByBatchUsingPost
-} from "@/api/pictureController";
+import {uploadPictureByBatchUsingPost} from "@/api/pictureController";
 import {message} from "ant-design-vue";
 
 const formData = reactive<API.PictureUploadByBatchRequest>({

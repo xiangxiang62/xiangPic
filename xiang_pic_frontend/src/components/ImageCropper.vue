@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import {ref} from 'vue'
 import {uploadPictureUsingPost} from "@/api/pictureController";
 import {message} from "ant-design-vue";
 

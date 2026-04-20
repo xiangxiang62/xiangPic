@@ -45,9 +45,9 @@ import SpaceTagAnalyze from '@/components/analyze/SpaceTagAnalyze.vue'
 import SpaceSizeAnalyze from '@/components/analyze/SpaceSizeAnalyze.vue'
 import SpaceUserAnalyze from '@/components/analyze/SpaceUserAnalyze.vue'
 import SpaceRankAnalyze from '@/components/analyze/SpaceRankAnalyze.vue'
-import { useRoute } from 'vue-router'
-import { computed } from 'vue'
-import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
+import {useRoute} from 'vue-router'
+import {computed} from 'vue'
+import {useLoginUserStore} from '@/stores/useLoginUserStore.ts'
 
 const route = useRoute()
 

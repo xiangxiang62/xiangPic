@@ -10,9 +10,9 @@
 import VChart from 'vue-echarts'
 import 'echarts'
 import 'echarts-wordcloud'
-import { computed, ref, watchEffect } from 'vue'
-import { getSpaceTagAnalyzeUsingPost } from '@/api/spaceAnalyzeController.ts'
-import { message } from 'ant-design-vue'
+import {computed, ref, watchEffect} from 'vue'
+import {getSpaceTagAnalyzeUsingPost} from '@/api/spaceAnalyzeController.ts'
+import {message} from 'ant-design-vue'
 
 interface Props {
   queryAll?: boolean

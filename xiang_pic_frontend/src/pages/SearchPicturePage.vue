@@ -33,10 +33,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { getPictureVoByIdUsingGet, searchPictureByPictureUsingPost } from '@/api/pictureController'
-import { message } from 'ant-design-vue'
+import {computed, onMounted, ref} from 'vue'
+import {useRoute} from 'vue-router'
+import {getPictureVoByIdUsingGet, searchPictureByPictureUsingPost} from '@/api/pictureController'
+import {message} from 'ant-design-vue'
 
 const route = useRoute()
 

@@ -50,10 +50,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive } from "vue";
-import { useRouter } from "vue-router";
-import { userRegisterUsingPost } from "@/api/userController";
-import { message } from "ant-design-vue";
+import {reactive} from "vue";
+import {useRouter} from "vue-router";
+import {userRegisterUsingPost} from "@/api/userController";
+import {message} from "ant-design-vue";
+
 const formState = reactive<API.UserRegisterRequest>({
   userAccount: "",
   userPassword: "",

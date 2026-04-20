@@ -18,8 +18,8 @@
 </template>
 <script lang="ts" setup>
 import {ref} from 'vue';
-import {message} from 'ant-design-vue';
 import type {UploadProps} from 'ant-design-vue';
+import {message} from 'ant-design-vue';
 import {uploadPictureUsingPost} from "@/api/pictureController";
 
 const props = defineProps<Props>();

@@ -39,11 +39,11 @@
 <script setup lang="ts">
 import {onUnmounted, ref} from 'vue'
 import {
-  createPictureOutPaintingTaskUsingPost, getPictureOutPaintingTaskUsingGet,
-  uploadPictureByUrlUsingPost,
-  uploadPictureUsingPost
+  createPictureOutPaintingTaskUsingPost,
+  getPictureOutPaintingTaskUsingGet,
+  uploadPictureByUrlUsingPost
 } from '@/api/pictureController'
-import { message } from 'ant-design-vue'
+import {message} from 'ant-design-vue'
 
 interface Props {
   picture?: API.PictureVO

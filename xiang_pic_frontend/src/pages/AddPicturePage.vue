@@ -78,7 +78,7 @@
 <script setup lang="ts">
 import PictureUpload from "@/components/PictureUpload.vue";
 import UrlPictureUpload from "@/components/UrlPictureUpload.vue";
-import {computed, onMounted, reactive, ref,h} from "vue";
+import {computed, h, onMounted, reactive, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {
   editPictureUsingPost,
@@ -87,7 +87,7 @@ import {
 } from "@/api/pictureController";
 import {message} from "ant-design-vue";
 import ImageCropper from "@/components/ImageCropper.vue";
-import {EditOutlined,FullscreenOutlined} from "@ant-design/icons-vue";
+import {EditOutlined, FullscreenOutlined} from "@ant-design/icons-vue";
 import ImageOutPainting from "@/components/ImageOutPainting.vue";
 
 const picture = ref<API.PictureVO>()

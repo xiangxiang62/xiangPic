@@ -21,7 +21,8 @@
         />
       </a-form-item>
       <a-form-item label="命名规则" name="nameRule">
-        <a-input v-model:value="formData.nameRule" placeholder="请输入命名规则，输入 {序号} 可动态生成" />
+        <a-input v-model:value="formData.nameRule"
+                 placeholder="请输入命名规则，输入 {序号} 可动态生成"/>
       </a-form-item>
       <a-form-item>
         <a-button type="primary" html-type="submit">提交</a-button>
@@ -31,12 +32,9 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, withDefaults, defineExpose, reactive, onMounted } from 'vue'
-import {
-  editPictureByBatchUsingPost,
-  listPictureTagCategoryUsingGet,
-} from '@/api/pictureController'
-import { message } from 'ant-design-vue'
+import {defineExpose, defineProps, onMounted, reactive, ref, withDefaults} from 'vue'
+import {editPictureByBatchUsingPost, listPictureTagCategoryUsingGet,} from '@/api/pictureController'
+import {message} from 'ant-design-vue'
 
 // 定义组件属性类型
 interface Props {

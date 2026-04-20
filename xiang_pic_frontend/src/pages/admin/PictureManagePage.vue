@@ -110,17 +110,18 @@
 <script lang="ts" setup>
 import {computed, onMounted, reactive, ref} from 'vue'
 import {
-  deletePictureUsingPost, doPictureReviewUsingPost,
+  deletePictureUsingPost,
+  doPictureReviewUsingPost,
   listPictureByPageUsingPost
 } from '@/api/pictureController.ts'
 import {message} from 'ant-design-vue'
 import dayjs from 'dayjs'
-import Picture = API.Picture;
 import {
   PIC_REVIEW_STATUS_ENUM,
   PIC_REVIEW_STATUS_MAP,
   PIC_REVIEW_STATUS_OPTIONS
 } from "@/constants/picture";
+import Picture = API.Picture;
 
 const columns = [
   {

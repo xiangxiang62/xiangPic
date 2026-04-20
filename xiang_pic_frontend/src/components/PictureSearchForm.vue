@@ -68,10 +68,11 @@
 
 <script setup lang="ts">
 import {onMounted, reactive, ref} from "vue";
-import PictureQueryRequest = API.PictureQueryRequest;
 import dayjs from "dayjs";
 import {listPictureTagCategoryUsingGet} from "@/api/pictureController";
 import {message} from "ant-design-vue";
+import PictureQueryRequest = API.PictureQueryRequest;
+
 interface Props {
   onSearch?: (searchParams: PictureQueryRequest) => void
 }

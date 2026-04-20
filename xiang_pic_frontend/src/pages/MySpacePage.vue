@@ -5,11 +5,11 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { listSpaceVoByPageUsingPost } from '@/api/spaceController'
-import { message } from 'ant-design-vue'
-import { useLoginUserStore } from '@/stores/useLoginUserStore'
+import {onMounted} from 'vue'
+import {useRouter} from 'vue-router'
+import {listSpaceVoByPageUsingPost} from '@/api/spaceController'
+import {message} from 'ant-design-vue'
+import {useLoginUserStore} from '@/stores/useLoginUserStore'
 
 const router = useRouter()
 const loginUserStore = useLoginUserStore()

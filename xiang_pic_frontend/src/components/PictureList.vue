@@ -45,8 +45,13 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
-import { DeleteOutlined, EditOutlined,SearchOutlined,ShareAltOutlined  } from '@ant-design/icons-vue';
+import {useRouter} from 'vue-router'
+import {
+  DeleteOutlined,
+  EditOutlined,
+  SearchOutlined,
+  ShareAltOutlined
+} from '@ant-design/icons-vue';
 import {deletePictureUsingPost} from "@/api/pictureController";
 import {message} from "ant-design-vue";
 import ShareModal from "@/components/ShareModal.vue";

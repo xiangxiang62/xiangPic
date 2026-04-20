@@ -89,11 +89,9 @@
 </template>
 
 <script setup lang="ts">
-import {
-  listPictureVoByPageUsingPost, searchPictureByColorUsingPost
-} from "@/api/pictureController";
-import {EditOutlined, BarChartOutlined, TeamOutlined} from "@ant-design/icons-vue";
-import {onMounted, ref, h, watch, computed} from "vue";
+import {listPictureVoByPageUsingPost, searchPictureByColorUsingPost} from "@/api/pictureController";
+import {BarChartOutlined, EditOutlined, TeamOutlined} from "@ant-design/icons-vue";
+import {computed, h, onMounted, ref, watch} from "vue";
 import {message} from "ant-design-vue";
 import {formatSize} from "@/utils";
 import PictureList from "@/components/PictureList.vue";

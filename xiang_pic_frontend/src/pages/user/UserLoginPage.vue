@@ -32,11 +32,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive } from "vue";
-import { useRouter } from "vue-router";
-import { useLoginUserStore } from "@/stores/useLoginUserStore";
-import { userLoginUsingPost } from "@/api/userController";
-import { message } from "ant-design-vue";
+import {reactive} from "vue";
+import {useRouter} from "vue-router";
+import {useLoginUserStore} from "@/stores/useLoginUserStore";
+import {userLoginUsingPost} from "@/api/userController";
+import {message} from "ant-design-vue";
+
 const formState = reactive<API.UserLoginRequest>({
   userAccount: "",
   userPassword: "",

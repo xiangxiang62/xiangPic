@@ -16,13 +16,13 @@
 <script lang="ts" setup>
 import {computed, h, ref, watchEffect} from "vue";
 import {useRouter} from "vue-router";
-import {PictureOutlined, UserOutlined, TeamOutlined} from '@ant-design/icons-vue';
-
-const router = useRouter();
+import {PictureOutlined, TeamOutlined, UserOutlined} from '@ant-design/icons-vue';
 import {useLoginUserStore} from "@/stores/useLoginUserStore.ts";
 import {SPACE_TYPE_ENUM} from "@/constants/spaceUser";
 import {message} from "ant-design-vue";
 import {listMyTeamSpaceUsingPost} from "@/api/spaceUserController";
+
+const router = useRouter();
 
 const loginUserStore = useLoginUserStore();
 // 路由跳转事件

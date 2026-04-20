@@ -102,7 +102,12 @@ import {deletePictureUsingPost, getPictureVoByIdUsingGet} from "@/api/pictureCon
 import {computed, onMounted, ref} from "vue";
 import {message} from "ant-design-vue";
 import {downloadImage, formatSize, toHexColor} from "@/utils";
-import { DeleteOutlined, EditOutlined,DownloadOutlined,ShareAltOutlined  } from '@ant-design/icons-vue';
+import {
+  DeleteOutlined,
+  DownloadOutlined,
+  EditOutlined,
+  ShareAltOutlined
+} from '@ant-design/icons-vue';
 // import {useLoginUserStore} from "@/stores/useLoginUserStore";
 import router from "@/router";
 import ShareModal from "@/components/ShareModal.vue";
