@@ -2,13 +2,19 @@
   <div id="spaceDetailPage">
     <!-- 空间信息 -->
     <a-flex justify="space-between">
-      <h2>{{ space.spaceName }}（私有空间）</h2>
+      <h2>{{ space.spaceName }}（{{ SPACE_TYPE_MAP[space.spaceType] }}）</h2>
       <a-space size="middle">
-        <a-button type="primary" :href="`/add_picture?spaceId=${id}`" target="_blank">
+        <a-button
+          v-if="canUploadPicture"
+          type="primary"
+          :href="`/add_picture?spaceId=${id}`"
+          target="_blank"
+        >
           + 创建图片
         </a-button>
         <a-button
           type="primary"
+          v-if="canManageSpaceUser"
           ghost
           :icon="h(BarChartOutlined)"
           :href="`/space_analyze?spaceId=${id}`"
@@ -16,9 +22,21 @@
         >
           空间分析
         </a-button>
-
-        <a-button @click="doBatchEdit">
-          <EditOutlined />
+        <a-button
+          type="primary"
+          v-if="canManageSpaceUser"
+          ghost
+          :icon="h(TeamOutlined)"
+          :href="`/spaceUserManage/${id}`"
+          target="_blank"
+        >
+          成员管理
+        </a-button>
+        <a-button
+          v-if="canManageSpaceUser"
+          @click="doBatchEdit"
+        >
+          <EditOutlined/>
           批量编辑
         </a-button>
         <a-tooltip
@@ -33,8 +51,8 @@
       </a-space>
     </a-flex>
     <!-- 搜索表单 -->
-    <PictureSearchForm :onSearch="onSearch" />
-    <div style="margin-bottom: 16px" ></div>
+    <PictureSearchForm :onSearch="onSearch"/>
+    <div style="margin-bottom: 16px"></div>
     <!-- 按颜色搜索 -->
     <a-form-item label="按颜色搜索" style="margin-top: 16px">
       <input
@@ -45,10 +63,13 @@
       />
     </a-form-item>
     <!-- 图片列表 -->
-    <PictureList :dataList="dataList"
-                 :loading="loading"
-                 showOp
-                 :onReload="fetchData"
+    <PictureList
+      :dataList="dataList"
+      :loading="loading"
+      :onReload="fetchData"
+      showOp
+      :canEdit="canEditPicture"
+      :canDelete="canDeletePicture"
     />
     <a-pagination
       style="text-align: right"
@@ -71,14 +92,16 @@
 import {
   listPictureVoByPageUsingPost, searchPictureByColorUsingPost
 } from "@/api/pictureController";
-import {EditOutlined,BarChartOutlined} from "@ant-design/icons-vue";
-import {onMounted, ref,h} from "vue";
+import {EditOutlined, BarChartOutlined, TeamOutlined} from "@ant-design/icons-vue";
+import {onMounted, ref, h, watch, computed} from "vue";
 import {message} from "ant-design-vue";
 import {formatSize} from "@/utils";
 import PictureList from "@/components/PictureList.vue";
 import {getSpaceVoByIdUsingGet} from "@/api/spaceController";
 import PictureSearchForm from "@/components/PictureSearchForm.vue";
 import BatchEditPictureModal from "@/components/BatchEditPictureModal.vue";
+import {SPACE_PERMISSION_ENUM, SPACE_TYPE_MAP} from "@/constants/spaceUser";
+
 const selectedColor = ref('#ffffff');
 const props = defineProps<{
   id: string | number
@@ -200,6 +223,28 @@ const doBatchEdit = () => {
 onMounted(() => {
   fetchData()
 })
+
+watch(
+  () => props.id,
+  (newSpaceId) => {
+    fetchSpaceDetail()
+    fetchData()
+  },
+)
+
+
+// ==== 通用权限检查函数 ====
+function createPermissionChecker(permission: string) {
+  return computed(() => {
+    return (space.value.permissionList ?? []).includes(permission)
+  })
+}
+
+// 定义权限检查
+const canManageSpaceUser = createPermissionChecker(SPACE_PERMISSION_ENUM.SPACE_USER_MANAGE)
+const canUploadPicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_UPLOAD)
+const canEditPicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_EDIT)
+const canDeletePicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_DELETE)
 </script>
 
 <style scoped>
