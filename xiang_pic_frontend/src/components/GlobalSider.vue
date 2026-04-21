@@ -109,7 +109,7 @@ watchEffect(() => {
 </script>
 
 <style scoped>
-.globalSider .ant-layout-sider {
-  background-color: white;
+#globalSider :deep(.ant-layout-sider-children) {
+  background: #fff !important;
 }
 </style>
