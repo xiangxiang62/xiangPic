@@ -3,6 +3,7 @@ package com.xiang.pic.xiangPicBackend.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xiang.pic.xiangPicBackend.api.aliyunai.model.CreateOutPaintingTaskResponse;
+import com.xiang.pic.xiangPicBackend.api.aliyunai.model.GetOutPaintingTaskResponse;
 import com.xiang.pic.xiangPicBackend.model.domain.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xiang.pic.xiangPicBackend.model.domain.User;
@@ -159,5 +160,28 @@ public interface PictureService extends IService<Picture> {
      */
     void checkPictureAuth(User loginUser, Picture picture);
 
+    /**
+     * 创建 AI 扩图
+     *
+     * @param createPictureOutPaintingTaskRequest
+     * @param loginUser
+     * @return
+     */
     CreateOutPaintingTaskResponse createPictureOutPaintingTask(CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest, User loginUser);
+
+    /**
+     * AI 扩图成功计数
+     *
+     * @param taskId
+     * @param task
+     * @param id
+     */
+    void countOutPaintingUsageIfSucceeded(String taskId, GetOutPaintingTaskResponse task, Long id);
+
+    /**
+     * 检查每日 AI 扩图限制
+     *
+     * @param id
+     */
+    void checkOutPaintingDailyLimit(Long id);
 }

@@ -426,6 +426,8 @@ public class PictureController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User loginUser = userService.getLoginUser(request);
+        // 限制每天每个用户使用 AI 扩图次数
+        pictureService.checkOutPaintingDailyLimit(loginUser.getId());
         CreateOutPaintingTaskResponse response = pictureService.createPictureOutPaintingTask(createPictureOutPaintingTaskRequest, loginUser);
         return ResultUtils.success(response);
     }
@@ -434,9 +436,11 @@ public class PictureController {
      * 查询 AI 扩图任务
      */
     @GetMapping("/out_painting/get_task")
-    public BaseResponse<GetOutPaintingTaskResponse> getPictureOutPaintingTask(String taskId) {
+    public BaseResponse<GetOutPaintingTaskResponse> getPictureOutPaintingTask(String taskId,HttpServletRequest request) {
         ThrowUtils.throwIf(StrUtil.isBlank(taskId), ErrorCode.PARAMS_ERROR);
         GetOutPaintingTaskResponse task = aliYunAiApi.getOutPaintingTask(taskId);
+        User loginUser = userService.getLoginUser(request);
+        pictureService.countOutPaintingUsageIfSucceeded(taskId, task, loginUser.getId());
         return ResultUtils.success(task);
     }
 
