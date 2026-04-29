@@ -81,7 +81,7 @@
 
 ### 2. 克隆项目
 ```bash
-git clone [https://github.com/xiangxiang62/xiangPic.git](https://github.com/xiangxiang62/xiangPic.git)
+git clone https://github.com/xiangxiang62/xiangPic.git
 ````
 
 ### 3\. 后端配置
