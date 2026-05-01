@@ -9,17 +9,22 @@ import com.xiang.pic.xiangPicBackend.exception.BusinessException;
 import com.xiang.pic.xiangPicBackend.exception.ErrorCode;
 import com.xiang.pic.xiangPicBackend.manager.auth.StpKit;
 import com.xiang.pic.xiangPicBackend.model.domain.User;
+import com.xiang.pic.xiangPicBackend.model.dto.space.SpaceAddRequest;
 import com.xiang.pic.xiangPicBackend.model.dto.user.UserQueryRequest;
 import com.xiang.pic.xiangPicBackend.model.enums.UserRoleEnum;
 import com.xiang.pic.xiangPicBackend.model.vo.user.LoginUserVO;
 import com.xiang.pic.xiangPicBackend.model.vo.user.UserVO;
+import com.xiang.pic.xiangPicBackend.service.SpaceService;
 import com.xiang.pic.xiangPicBackend.service.UserService;
 import com.xiang.pic.xiangPicBackend.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import java.util.ArrayList;
@@ -38,6 +43,11 @@ import static com.xiang.pic.xiangPicBackend.constant.UserConstant.USER_LOGIN_STA
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     implements UserService{
 
+
+    @Lazy
+    @Resource
+    private SpaceService spaceService;
+
     /**
      * 用户注册
      *
@@ -47,6 +57,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * @return
      */
     @Override
+    @Transactional
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
         // 1. 校验
         if (StrUtil.hasBlank(userAccount, userPassword, checkPassword)) {
@@ -80,6 +91,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (!saveResult) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "注册失败，数据库错误");
         }
+        SpaceAddRequest addRequest = new SpaceAddRequest();
+        // 用户注册成功直接创建个人空间
+        spaceService.addSpace(addRequest,user);
         return user.getId();
     }
 
