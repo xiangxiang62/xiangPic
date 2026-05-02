@@ -29,9 +29,14 @@
                 <a-menu>
                   <a-menu-item>
                     <router-link to="/my_space">
-                      <UserOutlined />
+                      <UserOutlined/>
                       我的空间
                     </router-link>
+                  </a-menu-item>
+                  <a-menu-item v-if="loginUserStore.loginUser.userRole === 'admin'"
+                               @click="doClearCache">
+                    <ClearOutlined/>
+                    清除缓存
                   </a-menu-item>
                   <a-menu-item @click="doLogout">
                     <LogoutOutlined/>
@@ -51,12 +56,13 @@
 </template>
 <script lang="ts" setup>
 import {h, ref} from "vue";
-import {HomeOutlined, LogoutOutlined, UserOutlined} from "@ant-design/icons-vue";
+import {HomeOutlined, LogoutOutlined, UserOutlined, ClearOutlined} from "@ant-design/icons-vue";
 import type {MenuProps} from "ant-design-vue";
 import {message} from "ant-design-vue";
 import {useLoginUserStore} from "@/stores/useLoginUserStore.ts";
 import {userLogoutUsingPost} from "@/api/userController";
 import {useRouter} from "vue-router";
+import {cleanCacheUsingGet} from "@/api/pictureController";
 
 const loginUserStore = useLoginUserStore();
 const router = useRouter();
@@ -123,6 +129,18 @@ const doLogout = async () => {
     message.error("退出登录失败，" + res.data.message);
   }
 };
+
+
+const doClearCache = async () => {
+  const res = await cleanCacheUsingGet();
+  console.log(res);
+  if (res.data.code === 0) {
+    message.success("缓存清理成功");
+  } else {
+    message.error("缓存清理失败，" + res.data.message);
+  }
+};
+
 </script>
 
 <style scoped>

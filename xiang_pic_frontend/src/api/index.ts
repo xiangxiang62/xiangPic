@@ -8,7 +8,6 @@ import * as spaceController from "./spaceController";
 import * as spaceAnalyzeController from "./spaceAnalyzeController";
 import * as spaceUserController from "./spaceUserController";
 import * as userController from "./userController";
-
 export default {
   pictureController,
   fileController,

@@ -426,6 +426,9 @@ public class PictureController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User loginUser = userService.getLoginUser(request);
+
+        // 限制每天每个用户最多使用 3 次 AI 扩图
+        pictureService.checkOutPaintingDailyLimit(loginUser.getId());
         CreateOutPaintingTaskResponse response = pictureService.createPictureOutPaintingTask(createPictureOutPaintingTaskRequest, loginUser);
         return ResultUtils.success(response);
     }

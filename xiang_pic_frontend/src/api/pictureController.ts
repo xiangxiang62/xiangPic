@@ -2,6 +2,14 @@
 /* eslint-disable */
 import request from "@/request";
 
+/** cleanCache GET /api/file/cleanCache */
+export async function cleanCacheUsingGet(options?: { [key: string]: any }) {
+  return request<API.BaseResponseBoolean_>("/api/file/cleanCache", {
+    method: "GET",
+    ...(options || {}),
+  });
+}
+
 /** deletePicture POST /api/file/delete */
 export async function deletePictureUsingPost(
   body: API.DeleteRequest,
