@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xiang.pic.xiangPicBackend.api.aliyunai.model.CreateOutPaintingTaskRequest;
 import com.xiang.pic.xiangPicBackend.api.aliyunai.model.CreateOutPaintingTaskResponse;
+import com.xiang.pic.xiangPicBackend.api.aliyunai.model.GetOutPaintingTaskResponse;
 import com.xiang.pic.xiangPicBackend.api.aliyunai.sub.AliYunAiApi;
 import com.xiang.pic.xiangPicBackend.exception.BusinessException;
 import com.xiang.pic.xiangPicBackend.exception.ErrorCode;
@@ -38,6 +39,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,11 +49,17 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static com.xiang.pic.xiangPicBackend.constant.PictureConstant.*;
 
 /**
  * @author 19643
@@ -87,6 +95,9 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
 
     @Resource
     private AliYunAiApi aliYunAiApi;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
 
     /**
@@ -789,6 +800,85 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         BeanUtil.copyProperties(createPictureOutPaintingTaskRequest, taskRequest);
         // 创建任务
         return aliYunAiApi.createOutPaintingTask(taskRequest);
+    }
+
+    /**
+     * AI 扩图成功计数
+     *
+     * @param taskId
+     * @param task
+     * @param userId
+     */
+    @Override
+    public void countOutPaintingUsageIfSucceeded(String taskId, GetOutPaintingTaskResponse task, Long userId) {
+        if (StrUtil.isBlank(taskId) || task == null || task.getOutput() == null || userId == null) {
+            return;
+        }
+
+        String taskStatus = task.getOutput().getTaskStatus();
+
+        // 只有成功才计数
+        if (!OUT_PAINTING_SUCCEEDED.equals(taskStatus)) {
+            return;
+        }
+
+        String taskCountedKey = OUT_PAINTING_DAILY_LIMIT_CACHE_KEY + taskId;
+
+        // setIfAbsent：只有第一次成功才会返回 true，避免前端轮询重复计数
+        Boolean firstCount = stringRedisTemplate.opsForValue().setIfAbsent(
+                taskCountedKey,
+                String.valueOf(userId),
+                7,
+                TimeUnit.DAYS
+        );
+
+        if (!Boolean.TRUE.equals(firstCount)) {
+            return;
+        }
+
+        String today = LocalDate.now().toString();
+        String userDailyLimitKey = String.format(OUT_PAINTING_DAILY_LIMIT_CACHE_KEY, userId, today);
+
+        Long count = stringRedisTemplate.opsForValue().increment(userDailyLimitKey);
+
+        if (count != null && count == 1) {
+            LocalDateTime tomorrowStart = LocalDate.now().plusDays(1).atStartOfDay();
+            long seconds = Duration.between(LocalDateTime.now(), tomorrowStart).getSeconds();
+            stringRedisTemplate.expire(userDailyLimitKey, seconds, TimeUnit.SECONDS);
+        }
+
+        if (count != null && count > OUT_PAINTING_DAILY_LIMIT) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "今日 AI 扩图次数已用完，请联系管理员");
+        }
+    }
+
+
+    /**
+     * 检查每日 AI 扩图限制
+     *
+     * @param userId
+     */
+    @Override
+    public void checkOutPaintingDailyLimit(Long userId) {
+        if (userId == null) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+        }
+
+        String today = LocalDate.now().toString();
+        String redisKey = String.format(OUT_PAINTING_DAILY_LIMIT_CACHE_KEY, userId, today);
+
+        Long count = stringRedisTemplate.opsForValue().increment(redisKey);
+
+        // 第一次设置过期时间，到今天结束
+        if (count != null && count == 1) {
+            LocalDateTime tomorrowStart = LocalDate.now().plusDays(1).atStartOfDay();
+            long seconds = Duration.between(LocalDateTime.now(), tomorrowStart).getSeconds();
+            stringRedisTemplate.expire(redisKey, seconds, TimeUnit.SECONDS);
+        }
+
+        if (count != null && count > OUT_PAINTING_DAILY_LIMIT) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "今日 AI 扩图次数已用完，请联系管理员");
+        }
     }
 
 }

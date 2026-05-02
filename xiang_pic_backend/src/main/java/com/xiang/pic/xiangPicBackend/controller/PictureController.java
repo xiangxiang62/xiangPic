@@ -34,12 +34,14 @@ import com.xiang.pic.xiangPicBackend.model.domain.Space;
 import com.xiang.pic.xiangPicBackend.model.domain.User;
 import com.xiang.pic.xiangPicBackend.model.dto.picture.*;
 import com.xiang.pic.xiangPicBackend.model.enums.PictureReviewStatusEnum;
+import com.xiang.pic.xiangPicBackend.model.enums.UserRoleEnum;
 import com.xiang.pic.xiangPicBackend.model.vo.picture.PictureTagCategory;
 import com.xiang.pic.xiangPicBackend.model.vo.picture.PictureVO;
 import com.xiang.pic.xiangPicBackend.service.PictureService;
 import com.xiang.pic.xiangPicBackend.service.SpaceService;
 import com.xiang.pic.xiangPicBackend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -244,13 +246,8 @@ public class PictureController {
         long size = pictureQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        // 普通用户默认只能查看已过审的数据
-        pictureQueryRequest.setReviewStatus(PictureReviewStatusEnum.PASS.getValue());
-
-        // 构建缓存 key
-        String queryCondition = JSONUtil.toJsonStr(pictureQueryRequest);
-        String hashKey = DigestUtils.md5DigestAsHex(queryCondition.getBytes());
-        String cacheKey = "xiangpicture:listPictureVOByPage:" + hashKey;
+        // 获取缓存 key
+        String cacheKey = getCacheKey();
 
         // 1. 查询本地缓存（Caffeine）
         String cachedValue = LOCAL_CACHE.getIfPresent(cacheKey);
@@ -426,8 +423,7 @@ public class PictureController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User loginUser = userService.getLoginUser(request);
-
-        // 限制每天每个用户最多使用 3 次 AI 扩图
+        // 限制每天每个用户使用 AI 扩图次数
         pictureService.checkOutPaintingDailyLimit(loginUser.getId());
         CreateOutPaintingTaskResponse response = pictureService.createPictureOutPaintingTask(createPictureOutPaintingTaskRequest, loginUser);
         return ResultUtils.success(response);
@@ -437,11 +433,48 @@ public class PictureController {
      * 查询 AI 扩图任务
      */
     @GetMapping("/out_painting/get_task")
-    public BaseResponse<GetOutPaintingTaskResponse> getPictureOutPaintingTask(String taskId) {
+    public BaseResponse<GetOutPaintingTaskResponse> getPictureOutPaintingTask(String taskId,HttpServletRequest request) {
         ThrowUtils.throwIf(StrUtil.isBlank(taskId), ErrorCode.PARAMS_ERROR);
         GetOutPaintingTaskResponse task = aliYunAiApi.getOutPaintingTask(taskId);
+        User loginUser = userService.getLoginUser(request);
+        pictureService.countOutPaintingUsageIfSucceeded(taskId, task, loginUser.getId());
         return ResultUtils.success(task);
     }
 
+
+
+    /**
+     * 清理缓存
+     */
+    @GetMapping("/cleanCache")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> cleanCache() {
+        String cacheKey = getCacheKey();
+        try{
+            stringRedisTemplate.delete(cacheKey);
+            LOCAL_CACHE.cleanUp();
+        }catch (Exception e){
+            log.info("清理缓存失败，cacheKey:{},错误：", cacheKey,e);
+        }
+        return ResultUtils.success(true);
+    }
+
+
+    /**
+     * 获取图片分页缓存 key
+     *
+     * @return
+     */
+    private static String getCacheKey() {
+        PictureQueryRequest cacheKeyRequest = new PictureQueryRequest();
+        // 普通用户默认只能查看已过审的数据
+        cacheKeyRequest.setReviewStatus(PictureReviewStatusEnum.PASS.getValue());
+
+        // 构建缓存 key
+        String queryCondition = JSONUtil.toJsonStr(cacheKeyRequest);
+        String hashKey = DigestUtils.md5DigestAsHex(queryCondition.getBytes());
+        String cacheKey = "xiangpicture:listPictureVOByPage:" + hashKey;
+        return cacheKey;
+    }
 
 }
